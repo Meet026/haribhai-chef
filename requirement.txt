@@ -1,0 +1,27 @@
+hero section inspiration :- https://www.marquet.nyc/
+
+reference website for most popular dishes section :- https://cateredplate.framer.website/ (this is the section you need to build)
+
+REQUIREMENT:-
+best dishes section aana jevu j structure joi e che top middle title, description
+middle ma atyre je photos aave che e and reference website ma atyre auto move che cards 
+have ema tyare mane evo vichar che ke jem jem user scroll kare em verical scroll ni balde horizontal scroll that
+
+atyre je porject ni zip tane moklu chu ema e section che tu e section ma scroll karje tane idea aavi jase, e rit nu hu vicharto hto
+
+and niche ek button explore menu, jena par click karva thi menu page par jase and tya menu category wise listing hase
+example:-
+Main Course -> Sev Tameta, Undhiyu, Ringan no Olo, Bhindi Sambhariya
+Sweets -> Shrikhand, Basundi, Mohanthal, Lapsi
+
+aa rit nu hu kaik vicharu chu baki tara kai idea hoy to tu e pam implement karje 
+
+and category wise listing kai rite karvu menu section e mane pan nthi khabar (if you want to take reference you can visit website https://www.awwwards.com/ mostly i got all the design related idea from here)
+
+menu section ma category wise dish nu listing dish par click kare etle detail section open karvvanu ema e dish banavva mate kya kya ingredients use thase e 
+and e dish na 2,3 photo and customer review for that dish (aana sivay tara pan koi idea hoy to e pan)
+
+aatlu atyre aa ek section ma karvanu che
+
+reference mate https://www.awwwards.com/ aa website joje and idea leje koi pan section na aama bahu sari sari website hoy che
+and tane je pan lage ke aa aam karvu joi e design ke layout wise je mara kidha according na hoy to tu tari rite change kari deje

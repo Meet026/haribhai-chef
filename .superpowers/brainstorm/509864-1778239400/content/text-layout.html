@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hero Text Layout</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #141414;
+      color: #FAF7F2;
+      font-family: 'Jost', sans-serif;
+      padding: 24px;
+      min-height: 100vh;
+    }
+    .page-title {
+      text-align: center;
+      font-family: 'Jost', sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #C8B89A;
+      margin-bottom: 6px;
+    }
+    .page-subtitle {
+      text-align: center;
+      font-size: 12px;
+      color: rgba(250,247,242,0.45);
+      letter-spacing: 0.05em;
+      margin-bottom: 28px;
+    }
+    .cards-row {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .card {
+      width: 300px;
+      border: 1.5px solid rgba(200,184,154,0.2);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.25s, box-shadow 0.25s;
+      background: #1C1C1A;
+    }
+    .card:hover { border-color: rgba(200,184,154,0.5); }
+    .card.selected {
+      border-color: #C8B89A;
+      box-shadow: 0 0 0 1px #C8B89A, 0 8px 40px rgba(200,184,154,0.12);
+    }
+    .card-label {
+      padding: 10px 16px 6px;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #C8B89A;
+      font-weight: 500;
+    }
+    .card-title {
+      padding: 0 16px 10px;
+      font-size: 15px;
+      font-weight: 400;
+      color: #FAF7F2;
+    }
+    .card-desc {
+      padding: 0 16px 14px;
+      font-size: 11.5px;
+      color: rgba(250,247,242,0.5);
+      line-height: 1.55;
+    }
+    /* ── Mockup viewport ── */
+    .mockup {
+      width: 100%;
+      height: 210px;
+      background: #1C1C1A;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(200,184,154,0.12);
+    }
+    .mockup::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(181,154,114,0.06) 0%, transparent 70%);
+    }
+    /* Oval frame */
+    .oval {
+      background: linear-gradient(160deg, #6b4226 0%, #3d2510 60%, #1a0d05 100%);
+      position: relative;
+      flex-shrink: 0;
+    }
+    .oval::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(28,28,26,0.28) 0%, transparent 50%, rgba(28,28,26,0.3) 100%);
+    }
+
+    /* ── Option A: Title above oval ── */
+    .layout-a {
+      flex-direction: column;
+      gap: 14px;
+    }
+    .layout-a .brand-above {
+      text-align: center;
+    }
+    .layout-a .brand-above h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 300;
+      font-style: italic;
+      color: #FAF7F2;
+      letter-spacing: -0.01em;
+      line-height: 1;
+    }
+    .layout-a .brand-above .rule {
+      width: 40px;
+      height: 1px;
+      background: rgba(200,184,154,0.5);
+      margin: 6px auto 0;
+    }
+    .layout-a .oval {
+      width: 68px;
+      height: 112px;
+      border-radius: 999px;
+    }
+    .layout-a .tagline-below {
+      font-size: 8px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(250,247,242,0.45);
+    }
+
+    /* ── Option B: Text centered over oval (current approach, refined) ── */
+    .layout-b {
+      position: relative;
+    }
+    .layout-b .oval {
+      width: 80px;
+      height: 132px;
+      border-radius: 999px;
+    }
+    .layout-b .text-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      pointer-events: none;
+      width: 100%;
+    }
+    .layout-b h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      font-weight: 300;
+      font-style: italic;
+      color: #FAF7F2;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      filter: drop-shadow(0 2px 12px rgba(0,0,0,0.7));
+      line-height: 1;
+    }
+    .layout-b .tagline-overlay {
+      font-size: 7px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(250,247,242,0.55);
+      margin-top: 56px;
+    }
+
+    /* ── Option C: Title stacked with more editorial treatment ── */
+    .layout-c {
+      flex-direction: column;
+      gap: 0;
+    }
+    .layout-c .brand-stack {
+      text-align: center;
+      padding-bottom: 12px;
+    }
+    .layout-c .eyebrow {
+      font-size: 7.5px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #C8B89A;
+      margin-bottom: 6px;
+    }
+    .layout-c h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 300;
+      font-style: italic;
+      color: #FAF7F2;
+      letter-spacing: -0.01em;
+      line-height: 1;
+    }
+    .layout-c .divider {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 7px;
+      justify-content: center;
+    }
+    .layout-c .divider span {
+      display: inline-block;
+      width: 28px;
+      height: 1px;
+      background: rgba(200,184,154,0.45);
+    }
+    .layout-c .divider em {
+      font-style: normal;
+      font-size: 7px;
+      color: #C8B89A;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    .layout-c .oval {
+      width: 68px;
+      height: 110px;
+      border-radius: 999px;
+    }
+    .layout-c .tagline-c {
+      font-size: 7.5px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(250,247,242,0.4);
+      margin-top: 10px;
+    }
+
+    .check-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 22px;
+      height: 22px;
+      background: #C8B89A;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #1C1C1A;
+      font-weight: 700;
+    }
+    .card.selected .check-badge { display: flex; }
+  </style>
+  <script>
+    function select(el) {
+      document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      const choice = el.dataset.choice;
+      const text = el.querySelector('.card-title').textContent;
+      if (window.recordChoice) recordChoice(choice, text);
+    }
+  </script>
+</head>
+<body>
+  <p class="page-title">Hero Text Layout</p>
+  <p class="page-subtitle">How should the brand name be positioned relative to the oval image?</p>
+
+  <div class="cards-row">
+
+    <!-- Option A -->
+    <div class="card" data-choice="a" onclick="select(this)">
+      <div class="check-badge">✓</div>
+      <div class="mockup layout-a">
+        <div class="brand-above">
+          <h1>હરિભાઈ રસોયા</h1>
+          <div class="rule"></div>
+        </div>
+        <div class="oval"></div>
+        <div class="tagline-below">Authentic Gujarati Catering</div>
+      </div>
+      <div class="card-label">Option A</div>
+      <div class="card-title">Title Above Oval</div>
+      <div class="card-desc">Brand name sits cleanly above the oval. Text and image don't compete. Tagline floats below. Very editorial.</div>
+    </div>
+
+    <!-- Option B -->
+    <div class="card" data-choice="b" onclick="select(this)">
+      <div class="check-badge">✓</div>
+      <div class="mockup layout-b">
+        <div class="oval"></div>
+        <div class="text-overlay">
+          <h1>હરિભાઈ રસોયા</h1>
+          <div class="tagline-overlay">Authentic Gujarati Catering</div>
+        </div>
+      </div>
+      <div class="card-label">Option B (Current)</div>
+      <div class="card-title">Text Over Oval</div>
+      <div class="card-desc">Brand name overlays the oval — layered, cinematic feel. Text and image share the same center. Disappears on scroll.</div>
+    </div>
+
+    <!-- Option C -->
+    <div class="card" data-choice="c" onclick="select(this)">
+      <div class="check-badge">✓</div>
+      <div class="mockup layout-c">
+        <div class="brand-stack">
+          <div class="eyebrow">Since 2010</div>
+          <h1>હરિભાઈ રસોયા</h1>
+          <div class="divider">
+            <span></span>
+            <em>Catering</em>
+            <span></span>
+          </div>
+        </div>
+        <div class="oval"></div>
+        <div class="tagline-c">Authentic Gujarati Experience</div>
+      </div>
+      <div class="card-label">Option C</div>
+      <div class="card-title">Editorial Stack</div>
+      <div class="card-desc">Eyebrow label + italic serif name + ornamental divider above oval. Adds luxury context and hierarchy. Most premium feel.</div>
+    </div>
+
+  </div>
+</body>
+</html>

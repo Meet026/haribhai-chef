@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text Treatment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #141414;
+      color: #FAF7F2;
+      font-family: 'Jost', sans-serif;
+      padding: 24px;
+      min-height: 100vh;
+    }
+    .page-title {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #C8B89A;
+      margin-bottom: 6px;
+    }
+    .page-subtitle {
+      text-align: center;
+      font-size: 12px;
+      color: rgba(250,247,242,0.45);
+      letter-spacing: 0.05em;
+      margin-bottom: 28px;
+    }
+    .cards-row {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .card {
+      width: 280px;
+      border: 1.5px solid rgba(200,184,154,0.2);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.25s, box-shadow 0.25s;
+      background: #1C1C1A;
+    }
+    .card:hover { border-color: rgba(200,184,154,0.5); }
+    .card.selected {
+      border-color: #C8B89A;
+      box-shadow: 0 0 0 1px #C8B89A, 0 8px 40px rgba(200,184,154,0.12);
+    }
+    .card-label {
+      padding: 10px 16px 4px;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #C8B89A;
+      font-weight: 500;
+    }
+    .card-title {
+      padding: 0 16px 8px;
+      font-size: 15px;
+      font-weight: 400;
+      color: #FAF7F2;
+    }
+    .card-desc {
+      padding: 0 16px 14px;
+      font-size: 11px;
+      color: rgba(250,247,242,0.5);
+      line-height: 1.55;
+    }
+    .mockup {
+      width: 100%;
+      height: 230px;
+      background: #1C1C1A;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(200,184,154,0.1);
+    }
+    .mockup::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(181,154,114,0.07) 0%, transparent 70%);
+    }
+    /* Oval */
+    .oval {
+      width: 82px;
+      height: 136px;
+      border-radius: 999px;
+      background: linear-gradient(160deg, #7a4a2a 0%, #3d2510 60%, #1a0d05 100%);
+      position: absolute;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .oval::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(28,28,26,0.28) 0%, transparent 50%, rgba(28,28,26,0.3) 100%);
+    }
+    .check-badge {
+      position: absolute;
+      top: 10px; right: 10px;
+      width: 22px; height: 22px;
+      background: #C8B89A;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #1C1C1A;
+      font-weight: 700;
+    }
+    .card.selected .check-badge { display: flex; }
+
+    /* ── Treatment A: Minimal Refined ── */
+    .treatment-a .text-block {
+      position: absolute;
+      text-align: center;
+      pointer-events: none;
+    }
+    .treatment-a h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 300;
+      font-style: italic;
+      color: #FAF7F2;
+      letter-spacing: 0.01em;
+      line-height: 1;
+      filter: drop-shadow(0 3px 18px rgba(0,0,0,0.8));
+    }
+    .treatment-a .tagline {
+      margin-top: 58px;
+      font-size: 7px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: rgba(250,247,242,0.5);
+    }
+
+    /* ── Treatment B: Ornamental Lines ── */
+    .treatment-b .text-block {
+      position: absolute;
+      text-align: center;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+    }
+    .treatment-b .ornament-line {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .treatment-b .ornament-line span {
+      display: inline-block;
+      width: 28px;
+      height: 0.5px;
+      background: rgba(200,184,154,0.6);
+    }
+    .treatment-b .ornament-line em {
+      font-style: normal;
+      font-size: 8px;
+      color: #C8B89A;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+    .treatment-b h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 300;
+      font-style: italic;
+      color: #FAF7F2;
+      letter-spacing: 0em;
+      line-height: 1;
+      filter: drop-shadow(0 3px 18px rgba(0,0,0,0.8));
+    }
+    .treatment-b .rule-bottom {
+      width: 44px;
+      height: 0.5px;
+      background: rgba(200,184,154,0.45);
+    }
+    .treatment-b .tagline {
+      font-size: 7px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(250,247,242,0.42);
+      margin-top: 50px;
+    }
+
+    /* ── Treatment C: Scrim + Gold Detail ── */
+    .treatment-c .text-block {
+      position: absolute;
+      text-align: center;
+      pointer-events: none;
+    }
+    .treatment-c .scrim {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 200px;
+      height: 90px;
+      background: radial-gradient(ellipse at center, rgba(10,8,6,0.45) 0%, transparent 75%);
+      pointer-events: none;
+    }
+    .treatment-c .eyebrow {
+      font-size: 7.5px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #C8B89A;
+      margin-bottom: 5px;
+    }
+    .treatment-c h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 27px;
+      font-weight: 300;
+      font-style: italic;
+      color: #FAF7F2;
+      letter-spacing: 0em;
+      line-height: 1;
+      filter: drop-shadow(0 2px 16px rgba(0,0,0,0.9));
+    }
+    .treatment-c .gold-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(200,184,154,0.6);
+      margin: 7px auto 0;
+    }
+    .treatment-c .tagline {
+      margin-top: 50px;
+      font-size: 7px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: rgba(250,247,242,0.45);
+      position: absolute;
+    }
+  </style>
+  <script>
+    function select(el) {
+      document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      const choice = el.dataset.choice;
+      const text = el.querySelector('.card-title').textContent;
+      if (window.recordChoice) recordChoice(choice, text);
+    }
+  </script>
+</head>
+<body>
+  <p class="page-title">Text Treatment Over Oval</p>
+  <p class="page-subtitle">How should the brand name look when layered over the oval image?</p>
+
+  <div class="cards-row">
+
+    <!-- Option A: Minimal Refined -->
+    <div class="card" data-choice="a" onclick="select(this)">
+      <div class="check-badge">✓</div>
+      <div class="mockup treatment-a">
+        <div class="oval"></div>
+        <div class="scrim" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:180px;height:80px;background:radial-gradient(ellipse at center,rgba(5,3,2,0.3) 0%,transparent 70%);pointer-events:none;"></div>
+        <div class="text-block">
+          <h1>હરિભાઈ રસોયા</h1>
+          <div class="tagline">Authentic Gujarati Catering · Since 2010</div>
+        </div>
+      </div>
+      <div class="card-label">Option A</div>
+      <div class="card-title">Minimal — Clean Float</div>
+      <div class="card-desc">Just the italic serif name, strong shadow, tagline far below. No decoration. Let the typography breathe.</div>
+    </div>
+
+    <!-- Option B: Ornamental Lines -->
+    <div class="card" data-choice="b" onclick="select(this)">
+      <div class="check-badge">✓</div>
+      <div class="mockup treatment-b">
+        <div class="oval"></div>
+        <div class="text-block">
+          <div class="ornament-line">
+            <span></span>
+            <em>Catering</em>
+            <span></span>
+          </div>
+          <h1>હરિભાઈ રસોયા</h1>
+          <div class="rule-bottom"></div>
+          <div class="tagline">Authentic Gujarati · Since 2010</div>
+        </div>
+      </div>
+      <div class="card-label">Option B</div>
+      <div class="card-title">Ornamental Lines</div>
+      <div class="card-desc">Thin gold rule + eyebrow label above title, hairline rule below. Framed and intentional — luxury magazine feel.</div>
+    </div>
+
+    <!-- Option C: Eyebrow + Gold Dot -->
+    <div class="card" data-choice="c" onclick="select(this)">
+      <div class="check-badge">✓</div>
+      <div class="mockup treatment-c">
+        <div class="oval"></div>
+        <div class="scrim"></div>
+        <div class="text-block">
+          <div class="eyebrow">Haribhai Rasoiya</div>
+          <h1>હરિભાઈ રસોયા</h1>
+          <div class="gold-dot"></div>
+          <div class="tagline">Authentic Gujarati Catering · Since 2010</div>
+        </div>
+      </div>
+      <div class="card-label">Option C</div>
+      <div class="card-title">Eyebrow + Gold Dot</div>
+      <div class="card-desc">Small english eyebrow label above the Gujarati name. Single gold dot below as a full stop. Contextual and refined.</div>
+    </div>
+
+  </div>
+</body>
+</html>
