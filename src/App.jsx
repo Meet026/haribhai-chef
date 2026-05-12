@@ -9,6 +9,7 @@ gsap.registerPlugin(ScrollTrigger);
 import Navbar from "./components/Navbar";
 import Home from "./Home";
 import Menu from "./pages/Menu";
+import ServiceDetail from "./pages/ServiceDetail";
 
 export default function App() {
   // Lenis smooth scroll
@@ -43,6 +44,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/menu" element={<Menu />} />
+        <Route path="/services/:id" element={<ServiceDetail />} />
       </Routes>
     </Router>
   );

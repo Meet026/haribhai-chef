@@ -12,6 +12,7 @@ export default function Navbar() {
   const [navVisible, setNavVisible] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+  const [pastHero, setPastHero] = useState(false);
   const dropdownRef = useRef(null);
   const location = useLocation();
   const isHomePage = location.pathname === "/";
@@ -30,13 +31,30 @@ export default function Navbar() {
   // Lock body scroll when mobile menu is open
   useEffect(() => {
     document.body.style.overflow = mobileMenuOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [mobileMenuOpen]);
 
   // Close mobile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location]);
+
+  // Switch nav style once user scrolls past the hero section
+  useEffect(() => {
+    if (!isHomePage) {
+      setPastHero(false);
+      return;
+    }
+    const check = () => {
+      const hero = document.getElementById("hero");
+      if (hero) setPastHero(hero.getBoundingClientRect().bottom <= 0);
+    };
+    check();
+    window.addEventListener("scroll", check, { passive: true });
+    return () => window.removeEventListener("scroll", check);
+  }, [isHomePage]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -48,8 +66,9 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const navColor = isHomePage ? "var(--color-ivory)" : "var(--color-charcoal)";
-  const navBg = isHomePage ? "transparent" : "rgba(245, 240, 232, 0.85)";
+  const solidNav = !isHomePage || pastHero;
+  const navColor = solidNav ? "var(--color-charcoal)" : "var(--color-ivory)";
+  const navBg = solidNav ? "rgba(245, 240, 232, 0.85)" : "transparent";
 
   const anchorHref = (id) => (isHomePage ? `#${id}` : `/#${id}`);
 
@@ -71,13 +90,12 @@ export default function Navbar() {
           justifyContent: "space-between",
           color: navColor,
           background: navBg,
-          backdropFilter: isHomePage ? "none" : "blur(10px)",
+          backdropFilter: solidNav ? "blur(10px)" : "none",
           opacity: navVisible ? 1 : 0,
           transform: navVisible ? "translateY(0)" : "translateY(-24px)",
           transition:
             "opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1), background 0.3s ease, color 0.3s ease",
-        }}
-      >
+        }}>
         {/* Logo */}
         <Link
           to="/"
@@ -93,8 +111,7 @@ export default function Navbar() {
             zIndex: 1001,
           }}
           onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.65")}
-          onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
-        >
+          onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}>
           હરિભાઈ રસોયા
         </Link>
 
@@ -122,10 +139,9 @@ export default function Navbar() {
                   padding: 0,
                 }}
                 onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.55")}
-                onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
-              >
+                onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}>
                 Services
-                <svg
+                {/* <svg
                   width="10"
                   height="10"
                   viewBox="0 0 10 10"
@@ -137,7 +153,7 @@ export default function Navbar() {
                 >
                   <line x1="5" y1="0" x2="5" y2="10" stroke="currentColor" strokeWidth="1.5" />
                   <line x1="0" y1="5" x2="10" y2="5" stroke="currentColor" strokeWidth="1.5" />
-                </svg>
+                </svg> */}
               </button>
 
               <div
@@ -159,9 +175,15 @@ export default function Navbar() {
                     ? "translateX(-50%) translateY(0)"
                     : "translateX(-50%) translateY(-8px)",
                   transition: "opacity 0.28s ease, transform 0.28s ease",
-                }}
-              >
-                {["Wedding Catering", "Corporate Events", "Birthday Celebrations", "Pooja & Rituals", "Social Gatherings", "Large Format Events"].map((s) => (
+                }}>
+                {[
+                  "Wedding Catering",
+                  "Corporate Events",
+                  "Birthday Celebrations",
+                  "Pooja & Rituals",
+                  "Social Gatherings",
+                  "Large Format Events",
+                ].map((s) => (
                   <a
                     key={s}
                     href={anchorHref("services")}
@@ -179,14 +201,14 @@ export default function Navbar() {
                       transition: "background 0.2s ease, color 0.2s ease",
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.background = "rgba(181,154,114,0.15)";
+                      e.currentTarget.style.background =
+                        "rgba(181,154,114,0.15)";
                       e.currentTarget.style.color = "var(--color-muted-gold)";
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.background = "transparent";
                       e.currentTarget.style.color = "var(--color-ivory)";
-                    }}
-                  >
+                    }}>
                     {s}
                   </a>
                 ))}
@@ -206,8 +228,7 @@ export default function Navbar() {
                 transition: "opacity 0.3s ease",
               }}
               onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.5")}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
-            >
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}>
               Menu
             </Link>
 
@@ -224,8 +245,7 @@ export default function Navbar() {
                 transition: "opacity 0.3s ease",
               }}
               onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.5")}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
-            >
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}>
               About Us
             </a>
 
@@ -237,7 +257,7 @@ export default function Navbar() {
                 gap: "8px",
                 padding: "10px 28px",
                 borderRadius: "2px",
-                border: `1px solid ${isHomePage ? "rgba(200,184,154,0.5)" : "var(--color-charcoal)"}`,
+                border: `1px solid ${solidNav ? "var(--color-charcoal)" : "rgba(200,184,154,0.5)"}`,
                 background: "transparent",
                 color: navColor,
                 fontFamily: "var(--font-body)",
@@ -246,19 +266,27 @@ export default function Navbar() {
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
                 textDecoration: "none",
-                transition: "background 0.25s ease, color 0.25s ease, border-color 0.25s ease",
+                transition:
+                  "background 0.25s ease, color 0.25s ease, border-color 0.25s ease",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = isHomePage ? "var(--color-ivory)" : "var(--color-charcoal)";
-                e.currentTarget.style.color = isHomePage ? "var(--color-charcoal)" : "var(--color-ivory)";
-                e.currentTarget.style.borderColor = isHomePage ? "var(--color-ivory)" : "var(--color-charcoal)";
+                e.currentTarget.style.background = solidNav
+                  ? "var(--color-charcoal)"
+                  : "var(--color-ivory)";
+                e.currentTarget.style.color = solidNav
+                  ? "var(--color-ivory)"
+                  : "var(--color-charcoal)";
+                e.currentTarget.style.borderColor = solidNav
+                  ? "var(--color-charcoal)"
+                  : "var(--color-ivory)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = "transparent";
                 e.currentTarget.style.color = navColor;
-                e.currentTarget.style.borderColor = isHomePage ? "rgba(200,184,154,0.5)" : "var(--color-charcoal)";
-              }}
-            >
+                e.currentTarget.style.borderColor = solidNav
+                  ? "var(--color-charcoal)"
+                  : "rgba(200,184,154,0.5)";
+              }}>
               Get In Touch
             </a>
           </nav>
@@ -284,38 +312,49 @@ export default function Navbar() {
               height: "40px",
               position: "relative",
               zIndex: 1001,
-            }}
-          >
+            }}>
             {/* Bar 1 */}
-            <span style={{
-              display: "block",
-              width: "22px",
-              height: "1.5px",
-              background: mobileMenuOpen ? "var(--color-ivory)" : navColor,
-              borderRadius: "2px",
-              transition: "transform 0.35s cubic-bezier(0.77,0,0.18,1), opacity 0.2s ease, background 0.3s ease",
-              transform: mobileMenuOpen ? "translateY(6.5px) rotate(45deg)" : "none",
-            }} />
+            <span
+              style={{
+                display: "block",
+                width: "22px",
+                height: "1.5px",
+                background: mobileMenuOpen ? "var(--color-ivory)" : navColor,
+                borderRadius: "2px",
+                transition:
+                  "transform 0.35s cubic-bezier(0.77,0,0.18,1), opacity 0.2s ease, background 0.3s ease",
+                transform: mobileMenuOpen
+                  ? "translateY(6.5px) rotate(45deg)"
+                  : "none",
+              }}
+            />
             {/* Bar 2 */}
-            <span style={{
-              display: "block",
-              width: "22px",
-              height: "1.5px",
-              background: mobileMenuOpen ? "var(--color-ivory)" : navColor,
-              borderRadius: "2px",
-              transition: "opacity 0.2s ease, background 0.3s ease",
-              opacity: mobileMenuOpen ? 0 : 1,
-            }} />
+            <span
+              style={{
+                display: "block",
+                width: "22px",
+                height: "1.5px",
+                background: mobileMenuOpen ? "var(--color-ivory)" : navColor,
+                borderRadius: "2px",
+                transition: "opacity 0.2s ease, background 0.3s ease",
+                opacity: mobileMenuOpen ? 0 : 1,
+              }}
+            />
             {/* Bar 3 */}
-            <span style={{
-              display: "block",
-              width: "22px",
-              height: "1.5px",
-              background: mobileMenuOpen ? "var(--color-ivory)" : navColor,
-              borderRadius: "2px",
-              transition: "transform 0.35s cubic-bezier(0.77,0,0.18,1), background 0.3s ease",
-              transform: mobileMenuOpen ? "translateY(-6.5px) rotate(-45deg)" : "none",
-            }} />
+            <span
+              style={{
+                display: "block",
+                width: "22px",
+                height: "1.5px",
+                background: mobileMenuOpen ? "var(--color-ivory)" : navColor,
+                borderRadius: "2px",
+                transition:
+                  "transform 0.35s cubic-bezier(0.77,0,0.18,1), background 0.3s ease",
+                transform: mobileMenuOpen
+                  ? "translateY(-6.5px) rotate(-45deg)"
+                  : "none",
+              }}
+            />
           </button>
         )}
       </header>
@@ -336,44 +375,48 @@ export default function Navbar() {
           opacity: mobileMenuOpen ? 1 : 0,
           pointerEvents: mobileMenuOpen ? "all" : "none",
           transition: "opacity 0.45s cubic-bezier(0.22,1,0.36,1)",
-        }}
-      >
-        {/* Ambient gold glow */}
-        <div style={{
-          position: "absolute",
-          inset: 0,
-          background: "radial-gradient(circle at 50% 60%, rgba(181,154,114,0.07) 0%, transparent 65%)",
-          pointerEvents: "none",
-        }} />
-
-        <nav style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "8px",
-          width: "100%",
-          padding: "0 40px",
         }}>
+        {/* Ambient gold glow */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "radial-gradient(circle at 50% 60%, rgba(181,154,114,0.07) 0%, transparent 65%)",
+            pointerEvents: "none",
+          }}
+        />
+
+        <nav
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "8px",
+            width: "100%",
+            padding: "0 40px",
+          }}>
           {/* Services */}
           <MobileNavLink
             href={anchorHref("services")}
             type="anchor"
             open={mobileMenuOpen}
             delay={0}
-            onClick={closeMobileMenu}
-          >
+            onClick={closeMobileMenu}>
             Services
           </MobileNavLink>
 
-          <div style={{
-            width: "40px",
-            height: "1px",
-            background: "rgba(200,184,154,0.2)",
-            margin: "4px 0",
-            opacity: mobileMenuOpen ? 1 : 0,
-            transform: mobileMenuOpen ? "scaleX(1)" : "scaleX(0)",
-            transition: "opacity 0.4s ease 0.15s, transform 0.4s ease 0.15s",
-          }} />
+          <div
+            style={{
+              width: "40px",
+              height: "1px",
+              background: "rgba(200,184,154,0.2)",
+              margin: "4px 0",
+              opacity: mobileMenuOpen ? 1 : 0,
+              transform: mobileMenuOpen ? "scaleX(1)" : "scaleX(0)",
+              transition: "opacity 0.4s ease 0.15s, transform 0.4s ease 0.15s",
+            }}
+          />
 
           {/* Menu */}
           <MobileNavLink
@@ -381,20 +424,21 @@ export default function Navbar() {
             type="route"
             open={mobileMenuOpen}
             delay={1}
-            onClick={closeMobileMenu}
-          >
+            onClick={closeMobileMenu}>
             Menu
           </MobileNavLink>
 
-          <div style={{
-            width: "40px",
-            height: "1px",
-            background: "rgba(200,184,154,0.2)",
-            margin: "4px 0",
-            opacity: mobileMenuOpen ? 1 : 0,
-            transform: mobileMenuOpen ? "scaleX(1)" : "scaleX(0)",
-            transition: "opacity 0.4s ease 0.25s, transform 0.4s ease 0.25s",
-          }} />
+          <div
+            style={{
+              width: "40px",
+              height: "1px",
+              background: "rgba(200,184,154,0.2)",
+              margin: "4px 0",
+              opacity: mobileMenuOpen ? 1 : 0,
+              transform: mobileMenuOpen ? "scaleX(1)" : "scaleX(0)",
+              transition: "opacity 0.4s ease 0.25s, transform 0.4s ease 0.25s",
+            }}
+          />
 
           {/* About Us */}
           <MobileNavLink
@@ -402,18 +446,19 @@ export default function Navbar() {
             type="anchor"
             open={mobileMenuOpen}
             delay={2}
-            onClick={closeMobileMenu}
-          >
+            onClick={closeMobileMenu}>
             About Us
           </MobileNavLink>
 
           {/* CTA */}
-          <div style={{
-            marginTop: "48px",
-            opacity: mobileMenuOpen ? 1 : 0,
-            transform: mobileMenuOpen ? "translateY(0)" : "translateY(16px)",
-            transition: "opacity 0.5s ease 0.35s, transform 0.5s cubic-bezier(0.22,1,0.36,1) 0.35s",
-          }}>
+          <div
+            style={{
+              marginTop: "48px",
+              opacity: mobileMenuOpen ? 1 : 0,
+              transform: mobileMenuOpen ? "translateY(0)" : "translateY(16px)",
+              transition:
+                "opacity 0.5s ease 0.35s, transform 0.5s cubic-bezier(0.22,1,0.36,1) 0.35s",
+            }}>
             <a
               href={anchorHref("contact")}
               onClick={closeMobileMenu}
@@ -432,25 +477,25 @@ export default function Navbar() {
                 letterSpacing: "0.15em",
                 textTransform: "uppercase",
                 textDecoration: "none",
-              }}
-            >
+              }}>
               Get In Touch
             </a>
           </div>
         </nav>
 
         {/* Bottom tagline */}
-        <p style={{
-          position: "absolute",
-          bottom: "40px",
-          fontFamily: "var(--font-body)",
-          fontSize: "0.65rem",
-          letterSpacing: "0.2em",
-          textTransform: "uppercase",
-          color: "rgba(250,247,242,0.3)",
-          opacity: mobileMenuOpen ? 1 : 0,
-          transition: "opacity 0.5s ease 0.5s",
-        }}>
+        <p
+          style={{
+            position: "absolute",
+            bottom: "40px",
+            fontFamily: "var(--font-body)",
+            fontSize: "0.65rem",
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+            color: "rgba(250,247,242,0.3)",
+            opacity: mobileMenuOpen ? 1 : 0,
+            transition: "opacity 0.5s ease 0.5s",
+          }}>
           Authentic Gujarati Catering · Since 2010
         </p>
       </div>

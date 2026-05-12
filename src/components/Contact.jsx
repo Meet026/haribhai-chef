@@ -214,7 +214,7 @@ export default function Contact() {
                     style={{
                       background: "transparent",
                       border: "none",
-                      borderBottom: "1px solid rgba(200,184,154,0.25)",
+                      borderBottom: "1px solid var(--border-subtle)",
                       padding: "12px 0",
                       color: "var(--color-ivory)",
                       fontFamily: "var(--font-body)",
@@ -224,7 +224,7 @@ export default function Contact() {
                       transition: "border-color 0.3s ease",
                     }}
                     onFocus={(e) => (e.currentTarget.style.borderColor = "var(--color-muted-gold)")}
-                    onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(200,184,154,0.25)")}
+                    onBlur={(e) => (e.currentTarget.style.borderColor = "var(--border-subtle)")}
                   />
                 </div>
               ))}
@@ -248,7 +248,7 @@ export default function Contact() {
                   style={{
                     background: "transparent",
                     border: "none",
-                    borderBottom: "1px solid rgba(200,184,154,0.25)",
+                    borderBottom: "1px solid var(--border-subtle)",
                     padding: "12px 0",
                     color: "var(--color-ivory)",
                     fontFamily: "var(--font-body)",
@@ -259,7 +259,7 @@ export default function Contact() {
                     transition: "border-color 0.3s ease",
                   }}
                   onFocus={(e) => (e.currentTarget.style.borderColor = "var(--color-muted-gold)")}
-                  onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(200,184,154,0.25)")}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = "var(--border-subtle)")}
                 />
               </div>
               <button
