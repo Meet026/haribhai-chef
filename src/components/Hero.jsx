@@ -48,7 +48,7 @@ export default function Hero() {
           scale: 1,
           duration: 0.8,
         },
-        "-=0.6"
+        "-=0.6",
       )
       .to(
         textGroupRef.current,
@@ -56,7 +56,7 @@ export default function Hero() {
           opacity: 1,
           duration: 0.6,
         },
-        "-=0.4"
+        "-=0.4",
       )
       .to(
         titleRef.current,
@@ -64,7 +64,7 @@ export default function Hero() {
           y: 0,
           duration: 0.6,
         },
-        "-=0.6"
+        "-=0.6",
       )
       .to(
         taglineRef.current,
@@ -73,7 +73,7 @@ export default function Hero() {
           y: 0,
           duration: 0.4,
         },
-        "-=0.4"
+        "-=0.4",
       );
 
     // ── 3. FLOAT ANIMATION ────────────────────────────────────
@@ -90,18 +90,23 @@ export default function Hero() {
     introTl.add(() => floatAnim.play());
 
     // ── 4. SCROLL TIMELINE ────────────────────────────────────
-    // Create the scroll timeline but keep it inactive until intro is mostly done
+    // Snapshot the frame's rendered pixel size so GSAP owns both dimensions
+    // with explicit numbers — prevents CSS aspect-ratio from fighting the tween
+    // mid-scroll and distorting the oval into a cylinder.
+    const frameEl = frameRef.current;
+    const { width: frameW, height: frameH } = frameEl.getBoundingClientRect();
+    gsap.set(frameEl, { width: frameW, height: frameH });
+
     const scrollTl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
         start: "top top",
         end: "bottom bottom",
-        scrub: true, // Immediate response
+        scrub: true,
         onUpdate: (self) => {
-          // Kill float if user scrolls
           if (self.progress > 0.001 && floatAnim.isActive()) {
             floatAnim.pause();
-            gsap.to([frameRef.current, textGroupRef.current], {
+            gsap.to([frameEl, textGroupRef.current], {
               y: 0,
               duration: 0.2,
               ease: "power1.out",
@@ -113,48 +118,29 @@ export default function Hero() {
       },
     });
 
-    // Start scroll animations from progress 0
     scrollTl
       .to(
         titleRef.current,
-        {
-          opacity: 0,
-          y: -100,
-          duration: 0.15,
-          ease: "none",
-        },
-        0 // IMMEDIATE START
+        { opacity: 0, y: -100, duration: 0.15, ease: "none" },
+        0,
       )
       .to(
         taglineRef.current,
-        {
-          opacity: 0,
-          y: 60,
-          duration: 0.15,
-          ease: "none",
-        },
-        0 // IMMEDIATE START
+        { opacity: 0, y: 60, duration: 0.15, ease: "none" },
+        0,
       )
       .to(
-        frameRef.current,
+        frameEl,
         {
-          width: "100vw",
-          height: "100vh",
-          borderRadius: "0px",
+          width: window.innerWidth,
+          height: window.innerHeight,
+          borderRadius: 0,
           duration: 0.6,
           ease: "none",
         },
-        0.1 // Slight delay for the oval to stay a bit before expanding
+        0.1,
       )
-      .to(
-        imgRef.current,
-        {
-          scale: 1.2,
-          duration: 0.6,
-          ease: "none",
-        },
-        0.1
-      );
+      .to(imgRef.current, { scale: 1.2, duration: 0.6, ease: "none" }, 0.1);
 
     // Sync intro and scroll: If user scrolls, skip intro
     const skipIntroOnScroll = () => {
@@ -179,7 +165,7 @@ export default function Hero() {
       floatAnim.kill();
       window.removeEventListener("scroll", skipIntroOnScroll);
       window.removeEventListener("resize", handleResize);
-      ScrollTrigger.getAll().forEach(st => st.kill());
+      ScrollTrigger.getAll().forEach((st) => st.kill());
     };
   }, []);
 
@@ -190,11 +176,7 @@ export default function Hero() {
         <div ref={curtainRef} className="hero-curtain" />
 
         <div ref={frameRef} className="hero-frame">
-          <img
-            ref={imgRef}
-            src="/Hero_Photo.png"
-            alt="Haribhai Rasoiya"
-          />
+          <img ref={imgRef} src="/Hero_Photo.png" alt="Haribhai Rasoiya" />
           <div className="hero-frame-overlay" />
         </div>
 
@@ -212,8 +194,7 @@ export default function Hero() {
                 <textPath
                   xlinkHref="#curve-path"
                   startOffset="50%"
-                  textAnchor="middle"
-                >
+                  textAnchor="middle">
                   Authentic Gujarati Catering · Since 2010
                 </textPath>
               </text>

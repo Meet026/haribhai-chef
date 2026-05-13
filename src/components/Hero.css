@@ -2,7 +2,8 @@
 .hero-section {
   position: relative;
   width: 100%;
-  height: 500vh; /* Scroll height */
+  height: 500vh;
+  /* Scroll height */
   background: var(--color-charcoal);
 }
 
@@ -38,9 +39,10 @@
 /* Expanding Frame (Oval) */
 .hero-frame {
   position: relative;
-  width: 36vw;
-  height: 70vh;
-  aspect-ratio: 1 / 1.8;
+  /* Width scales with viewport; height is derived — oval ratio is always preserved */
+  width: clamp(200px, 28vw, 480px);
+  height: auto;
+  aspect-ratio: 2 / 3;
   border-radius: 500px;
   overflow: hidden;
   z-index: 5;
@@ -104,7 +106,8 @@
 /* Curved Tagline */
 .hero-tagline-container {
   position: absolute;
-  top: calc(50% + 36vh);
+  /* half of oval height = clamp(200px,28vw,480px) × 0.75, plus a small gap */
+  top: calc(50% + clamp(200px, 28vw, 480px) * 0.75 + 8px);
   width: 100%;
   max-width: 600px;
   height: 120px;
@@ -127,21 +130,29 @@
   fill: rgba(250, 247, 242, 0.65);
 }
 
-/* Mobile Adjustments */
+/* Tablet */
+@media (max-width: 1024px) {
+  .hero-frame {
+    width: clamp(200px, 42vw, 380px);
+  }
+
+  .hero-tagline-container {
+    top: calc(50% + clamp(200px, 42vw, 380px) * 0.75 + 8px);
+  }
+}
+
+/* Mobile */
 @media (max-width: 768px) {
   .hero-frame {
-    width: 65vw;
-    height: auto;
-    aspect-ratio: 1 / 1.5;
-    border-radius: 400px;
+    width: clamp(160px, 58vw, 260px);
   }
-  
+
   .hero-tagline-container {
-    top: calc(50% + 48vw + 10px); /* Positioned relative to oval height (65vw * 1.5 / 2 = 48.75vw) */
+    top: calc(50% + clamp(160px, 58vw, 260px) * 0.75 + 8px);
     max-width: 260px;
     height: 80px;
   }
-  
+
   .hero-tagline-text {
     font-size: 8px;
     letter-spacing: 0.15em;
@@ -156,11 +167,14 @@
   }
 }
 
-/* Ultra-wide screens */
+/* Ultra-wide */
 @media (min-width: 2000px) {
   .hero-frame {
-    width: 30vw;
-    height: 70vh;
+    width: clamp(480px, 22vw, 640px);
+  }
+
+  .hero-tagline-container {
+    top: calc(50% + clamp(480px, 22vw, 640px) * 0.75 + 8px);
   }
 }
 
