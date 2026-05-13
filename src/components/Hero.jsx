@@ -5,10 +5,6 @@ import "./Hero.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
-/**
- * HARIBHAI RASOIYA — Cinematic Scroll Hero
- * Refactored for full responsiveness and production-ready scroll behavior.
- */
 export default function Hero() {
   const sectionRef = useRef(null);
   const stickyRef = useRef(null);
@@ -22,9 +18,12 @@ export default function Hero() {
   useEffect(() => {
     if (!sectionRef.current) return;
 
+    const stickyEl = stickyRef.current;
+    const frameEl = frameRef.current;
+
     // ── 1. INITIAL STATE ──────────────────────────────────────
     gsap.set(curtainRef.current, { xPercent: 0 });
-    gsap.set(frameRef.current, { opacity: 0, scale: 0.95 });
+    gsap.set(frameEl, { opacity: 0, scale: 0.95 });
     gsap.set(textGroupRef.current, { opacity: 0 });
     gsap.set(titleRef.current, { y: 20 });
     gsap.set(taglineRef.current, { opacity: 0, y: 10 });
@@ -41,43 +40,13 @@ export default function Hero() {
         ease: "expo.inOut",
         delay: 0.2,
       })
-      .to(
-        frameRef.current,
-        {
-          opacity: 1,
-          scale: 1,
-          duration: 0.8,
-        },
-        "-=0.6",
-      )
-      .to(
-        textGroupRef.current,
-        {
-          opacity: 1,
-          duration: 0.6,
-        },
-        "-=0.4",
-      )
-      .to(
-        titleRef.current,
-        {
-          y: 0,
-          duration: 0.6,
-        },
-        "-=0.6",
-      )
-      .to(
-        taglineRef.current,
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.4,
-        },
-        "-=0.4",
-      );
+      .to(frameEl, { opacity: 1, scale: 1, duration: 0.8 }, "-=0.6")
+      .to(textGroupRef.current, { opacity: 1, duration: 0.6 }, "-=0.4")
+      .to(titleRef.current, { y: 0, duration: 0.6 }, "-=0.6")
+      .to(taglineRef.current, { opacity: 1, y: 0, duration: 0.4 }, "-=0.4");
 
     // ── 3. FLOAT ANIMATION ────────────────────────────────────
-    const floatAnim = gsap.to([frameRef.current, textGroupRef.current], {
+    const floatAnim = gsap.to([frameEl, textGroupRef.current], {
       y: -6,
       duration: 2.5,
       ease: "sine.inOut",
@@ -90,59 +59,80 @@ export default function Hero() {
     introTl.add(() => floatAnim.play());
 
     // ── 4. SCROLL TIMELINE ────────────────────────────────────
-    // Snapshot the frame's rendered pixel size so GSAP owns both dimensions
-    // with explicit numbers — prevents CSS aspect-ratio from fighting the tween
-    // mid-scroll and distorting the oval into a cylinder.
-    const frameEl = frameRef.current;
-    const { width: frameW, height: frameH } = frameEl.getBoundingClientRect();
-    gsap.set(frameEl, { width: frameW, height: frameH });
+    // Re-creatable so resize can refresh dimensions without visual drift.
+    let scrollTl = null;
 
-    const scrollTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: "top top",
-        end: "bottom bottom",
-        scrub: true,
-        onUpdate: (self) => {
-          if (self.progress > 0.001 && floatAnim.isActive()) {
-            floatAnim.pause();
-            gsap.to([frameEl, textGroupRef.current], {
-              y: 0,
-              duration: 0.2,
-              ease: "power1.out",
-            });
-          } else if (self.progress <= 0.001 && !floatAnim.isActive()) {
-            floatAnim.play();
-          }
-        },
-      },
-    });
+    const setupScrollAnim = () => {
+      if (scrollTl) scrollTl.kill();
+      // Kill only scroll-driven triggers; intro/float are separate.
+      ScrollTrigger.getAll().forEach((st) => st.kill());
 
-    scrollTl
-      .to(
-        titleRef.current,
-        { opacity: 0, y: -100, duration: 0.15, ease: "none" },
-        0,
-      )
-      .to(
-        taglineRef.current,
-        { opacity: 0, y: 60, duration: 0.15, ease: "none" },
-        0,
-      )
-      .to(
-        frameEl,
-        {
-          width: window.innerWidth,
-          height: window.innerHeight,
-          borderRadius: 0,
-          duration: 0.6,
-          ease: "none",
-        },
-        0.1,
-      )
-      .to(imgRef.current, { scale: 1.2, duration: 0.6, ease: "none" }, 0.1);
+      // Reset any inline size GSAP may have set, then read CSS-computed size.
+      gsap.set(frameEl, { clearProps: "width,height" });
 
-    // Sync intro and scroll: If user scrolls, skip intro
+      // rAF ensures the browser has painted the CSS size before we measure.
+      requestAnimationFrame(() => {
+        const { width: fw, height: fh } = frameEl.getBoundingClientRect();
+        // Lock dimensions so CSS aspect-ratio can't fight GSAP mid-tween.
+        gsap.set(frameEl, { width: fw, height: fh });
+
+        // Use sticky container dimensions — matches 100dvh exactly.
+        const targetW = stickyEl.clientWidth;
+        const targetH = stickyEl.clientHeight;
+
+        scrollTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top top",
+            end: "bottom bottom",
+            scrub: true,
+            onUpdate: (self) => {
+              if (self.progress > 0.001 && floatAnim.isActive()) {
+                floatAnim.pause();
+                gsap.to([frameEl, textGroupRef.current], {
+                  y: 0,
+                  duration: 0.2,
+                  ease: "power1.out",
+                });
+              } else if (self.progress <= 0.001 && !floatAnim.isActive()) {
+                floatAnim.play();
+              }
+            },
+          },
+        });
+
+        scrollTl
+          .to(
+            titleRef.current,
+            { opacity: 0, y: -100, duration: 0.15, ease: "none" },
+            0,
+          )
+          .to(
+            taglineRef.current,
+            { opacity: 0, y: 60, duration: 0.15, ease: "none" },
+            0,
+          )
+          .to(
+            frameEl,
+            {
+              width: targetW,
+              height: targetH,
+              borderRadius: 0,
+              duration: 0.6,
+              ease: "none",
+            },
+            0.1,
+          )
+          .to(imgRef.current, { scale: 1.2, duration: 0.6, ease: "none" }, 0.1);
+      });
+    };
+
+    setupScrollAnim();
+
+    // Refresh after intro so ScrollTrigger recalculates with final positions.
+    introTl.add(() => { ScrollTrigger.refresh(); });
+
+    // Skip intro if user arrives mid-scroll.
     const skipIntroOnScroll = () => {
       if (window.scrollY > 10) {
         introTl.progress(1);
@@ -151,18 +141,19 @@ export default function Hero() {
     };
     window.addEventListener("scroll", skipIntroOnScroll);
 
-    // Final refresh
-    introTl.add(() => {
-      ScrollTrigger.refresh();
-    });
-
-    const handleResize = () => ScrollTrigger.refresh();
+    // Debounced resize: re-snapshot frame and rebuild scroll animation.
+    let resizeTimer;
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(setupScrollAnim, 150);
+    };
     window.addEventListener("resize", handleResize);
 
     return () => {
       introTl.kill();
-      scrollTl.kill();
+      if (scrollTl) scrollTl.kill();
       floatAnim.kill();
+      clearTimeout(resizeTimer);
       window.removeEventListener("scroll", skipIntroOnScroll);
       window.removeEventListener("resize", handleResize);
       ScrollTrigger.getAll().forEach((st) => st.kill());

@@ -1,9 +1,19 @@
-/* Hero section container */
+/* ─────────────────────────────────────────────────────────────
+   HERO — Mobile-first responsive layout
+   Oval token (--hero-oval-w) drives both the frame size
+   and the tagline offset so they stay in sync at every breakpoint.
+──────────────────────────────────────────────────────────────── */
+
+/* ─── Oval-width token: set for mobile, overridden up the scale ─── */
+:root {
+  --hero-oval-w: min(58vw, 50dvh);
+}
+
+/* ─── Scroll scaffold ─── */
 .hero-section {
   position: relative;
   width: 100%;
-  height: 500vh;
-  /* Scroll height */
+  height: 500dvh;
   background: var(--color-charcoal);
 }
 
@@ -11,7 +21,7 @@
   position: sticky;
   top: 0;
   width: 100%;
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -19,15 +29,19 @@
   background: var(--color-charcoal);
 }
 
-/* Ambient glow */
+/* ─── Ambient glow ─── */
 .hero-ambient-glow {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(181, 154, 114, 0.08) 0%, transparent 70%);
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(181, 154, 114, 0.08) 0%,
+    transparent 70%
+  );
   z-index: 0;
 }
 
-/* Intro Curtain */
+/* ─── Intro curtain ─── */
 .hero-curtain {
   position: absolute;
   inset: 0;
@@ -36,18 +50,17 @@
   pointer-events: all;
 }
 
-/* Expanding Frame (Oval) */
+/* ─── Oval Frame ─── */
 .hero-frame {
   position: relative;
-  /* Width scales with viewport; height is derived — oval ratio is always preserved */
-  width: clamp(200px, 28vw, 480px);
+  width: var(--hero-oval-w);
   height: auto;
   aspect-ratio: 2 / 3;
   border-radius: 500px;
   overflow: hidden;
   z-index: 5;
   will-change: width, height, border-radius, transform;
-  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   opacity: 0;
 }
 
@@ -61,10 +74,15 @@
 .hero-frame-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, rgba(28, 28, 26, 0.35) 0%, transparent 50%, rgba(28, 28, 26, 0.35) 100%);
+  background: linear-gradient(
+    to bottom,
+    rgba(28, 28, 26, 0.35) 0%,
+    transparent 50%,
+    rgba(28, 28, 26, 0.35) 100%
+  );
 }
 
-/* Brand Text Group */
+/* ─── Text Group ─── */
 .hero-text-group {
   position: absolute;
   top: 50%;
@@ -87,30 +105,38 @@
   justify-content: center;
 }
 
+/* Mobile title — wraps gracefully */
 .hero-title {
   font-family: var(--font-display);
-  font-size: clamp(3.5rem, 10vw, 12rem);
+  font-size: clamp(2rem, 10vw, 3rem);
   font-weight: 300;
   font-style: italic;
   color: var(--color-ivory);
   line-height: 1.1;
   margin: 0;
-  white-space: nowrap;
-  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+  white-space: normal;
+  word-break: keep-all;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
   will-change: clip-path, transform;
   letter-spacing: -0.01em;
   text-align: center;
-  padding: 0 5vw;
+  padding: 0 8vw;
 }
 
-/* Curved Tagline */
+/* ─── Curved tagline ─── */
+/*
+  Effective top from viewport top:
+    viewport_center + oval_height/2 + gap
+  = 50%  +  (oval_width × 0.75)  +  8px
+  The 50% here cancels with the parent's translate(-50%,-50%),
+  giving exactly: sticky_container_midpoint + oval_height/2 + 8px.
+*/
 .hero-tagline-container {
   position: absolute;
-  /* half of oval height = clamp(200px,28vw,480px) × 0.75, plus a small gap */
-  top: calc(50% + clamp(200px, 28vw, 480px) * 0.75 + 8px);
+  top: calc(50% + var(--hero-oval-w) * 0.75 + 8px);
   width: 100%;
-  max-width: 600px;
-  height: 120px;
+  max-width: 240px;
+  height: 60px;
   display: flex;
   justify-content: center;
   will-change: opacity, transform;
@@ -124,61 +150,13 @@
 
 .hero-tagline-text {
   font-family: var(--font-body);
-  font-size: 12px;
-  letter-spacing: 0.22em;
+  font-size: 8px;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   fill: rgba(250, 247, 242, 0.65);
 }
 
-/* Tablet */
-@media (max-width: 1024px) {
-  .hero-frame {
-    width: clamp(200px, 42vw, 380px);
-  }
-
-  .hero-tagline-container {
-    top: calc(50% + clamp(200px, 42vw, 380px) * 0.75 + 8px);
-  }
-}
-
-/* Mobile */
-@media (max-width: 768px) {
-  .hero-frame {
-    width: clamp(160px, 58vw, 260px);
-  }
-
-  .hero-tagline-container {
-    top: calc(50% + clamp(160px, 58vw, 260px) * 0.75 + 8px);
-    max-width: 260px;
-    height: 80px;
-  }
-
-  .hero-tagline-text {
-    font-size: 8px;
-    letter-spacing: 0.15em;
-  }
-
-  .hero-title {
-    font-size: clamp(1.8rem, 12vw, 4rem);
-    white-space: normal;
-    word-break: keep-all;
-    line-height: 1.2;
-    padding: 0 10vw;
-  }
-}
-
-/* Ultra-wide */
-@media (min-width: 2000px) {
-  .hero-frame {
-    width: clamp(480px, 22vw, 640px);
-  }
-
-  .hero-tagline-container {
-    top: calc(50% + clamp(480px, 22vw, 640px) * 0.75 + 8px);
-  }
-}
-
-/* Particles */
+/* ─── Particles ─── */
 .hero-particles {
   position: absolute;
   inset: 0;
@@ -191,4 +169,105 @@
   background: var(--color-warm-tan);
   border-radius: 50%;
   opacity: 0.12;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BREAKPOINTS — mobile-first, progressive enhancement
+═══════════════════════════════════════════════════════════════ */
+
+/* ─── Landscape phones (short screens) ─── */
+@media (orientation: landscape) and (max-height: 500px) {
+  :root {
+    --hero-oval-w: min(26vw, 62dvh);
+  }
+
+  .hero-tagline-container {
+    display: none;
+  }
+
+  .hero-title {
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    padding: 0 4vw;
+    white-space: nowrap;
+  }
+}
+
+/* ─── sm ≥ 640px ─── */
+@media (min-width: 640px) {
+  :root {
+    --hero-oval-w: min(46vw, 48dvh);
+  }
+
+  .hero-title {
+    font-size: clamp(2.5rem, 7vw, 5rem);
+    white-space: nowrap;
+    word-break: normal;
+    padding: 0 6vw;
+  }
+
+  .hero-tagline-container {
+    max-width: 360px;
+    height: 80px;
+  }
+
+  .hero-tagline-text {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+  }
+}
+
+/* ─── md ≥ 768px ─── */
+@media (min-width: 768px) {
+  :root {
+    --hero-oval-w: min(38vw, 50dvh);
+  }
+
+  .hero-title {
+    font-size: clamp(3rem, 8vw, 7rem);
+    padding: 0 5vw;
+  }
+
+  .hero-tagline-container {
+    max-width: 440px;
+    height: 90px;
+  }
+
+  .hero-tagline-text {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+  }
+}
+
+/* ─── lg ≥ 1024px ─── */
+@media (min-width: 1024px) {
+  :root {
+    --hero-oval-w: clamp(200px, 28vw, 480px);
+  }
+
+  .hero-frame {
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+  }
+
+  .hero-title {
+    font-size: clamp(3.5rem, 10vw, 12rem);
+    white-space: nowrap;
+    padding: 0 5vw;
+  }
+
+  .hero-tagline-container {
+    max-width: 600px;
+    height: 120px;
+  }
+
+  .hero-tagline-text {
+    font-size: 12px;
+    letter-spacing: 0.22em;
+  }
+}
+
+/* ─── 2xl ≥ 2000px ─── */
+@media (min-width: 2000px) {
+  :root {
+    --hero-oval-w: clamp(480px, 22vw, 640px);
+  }
 }
