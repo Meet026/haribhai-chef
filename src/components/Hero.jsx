@@ -63,9 +63,7 @@ export default function Hero() {
     let scrollTl = null;
 
     const setupScrollAnim = () => {
-      if (scrollTl) scrollTl.kill();
-      // Kill only scroll-driven triggers; intro/float are separate.
-      ScrollTrigger.getAll().forEach((st) => st.kill());
+      if (scrollTl) scrollTl.kill(); // also kills scrollTl.scrollTrigger in GSAP 3
 
       // Reset any inline size GSAP may have set, then read CSS-computed size.
       gsap.set(frameEl, { clearProps: "width,height" });

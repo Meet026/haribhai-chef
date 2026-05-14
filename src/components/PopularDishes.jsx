@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Link } from "react-router-dom";
+import "./PopularDishes.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -75,9 +76,15 @@ const ALL_DISHES = [
   },
 ];
 
-const CARD_W = 340;
-const CARD_H = 390;
 const GAP = 32;
+
+// Compute card width matching the CSS clamp() formula so marquee duration is accurate.
+// Called once at mount — never on resize (avoids restarting the CSS animation).
+function getFluidCardW() {
+  if (typeof window === "undefined") return 340;
+  const vw = window.innerWidth;
+  return Math.min(340, Math.max(280, Math.round(100 + 0.2344 * vw)));
+}
 
 export default function PopularDishes() {
   const sectionRef = useRef(null);
@@ -85,8 +92,23 @@ export default function PopularDishes() {
   const subRef = useRef(null);
   const btnRef = useRef(null);
   const eyebrowRef = useRef(null);
+
+  // true  → mobile  (<768px): static 3-card list, no animation
+  // false → tablet/desktop: marquee animation
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== "undefined" && window.innerWidth < 768,
+  );
+
   const [isPaused, setIsPaused] = useState(false);
 
+  useEffect(() => {
+    const mqMobile = window.matchMedia("(max-width: 767px)");
+    const onMobile = (e) => setIsMobile(e.matches);
+    mqMobile.addEventListener("change", onMobile);
+    return () => mqMobile.removeEventListener("change", onMobile);
+  }, []);
+
+  // Header scroll-reveal (all screen sizes)
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
@@ -113,42 +135,35 @@ export default function PopularDishes() {
     return () => ctx.revert();
   }, []);
 
-  const totalWidth = ALL_DISHES.length * (CARD_W + GAP);
-  const speed = 45;
-  const duration = totalWidth / speed;
+  // Compute duration once — CSS clamp() handles visual sizing, this just drives speed.
+  const duration = useMemo(
+    () => (ALL_DISHES.length * (getFluidCardW() + GAP)) / 45,
+    [],
+  );
 
   return (
     <section
       ref={sectionRef}
       id="popular-dishes"
+      className="popular-section-wrap"
       style={{
         background: "var(--surface-primary)",
         position: "relative",
         overflow: "hidden",
         padding: "120px 0 100px",
       }}>
-      {/* SVG Mask Definition */}
+      {/* SVG clip-path definition (used by all DishCards) */}
       <svg width="0" height="0" style={{ position: "absolute" }}>
         <defs>
           <clipPath id="barrelClip" clipPathUnits="objectBoundingBox">
-            {/* Precision Squircle: 1% inset to prevent hover clipping + crisp corners */}
-            <path
-              d="M 0.06,0.03 
-                     Q 0.5,-0.01 0.94,0.03 
-                     C 0.955,0.031 0.969,0.045 0.97,0.06 
-                     Q 1.01,0.5 0.97,0.94 
-                     C 0.969,0.955 0.955,0.969 0.94,0.97 
-                     Q 0.5,1.01 0.06,0.97 
-                     C 0.045,0.969 0.031,0.955 0.03,0.94 
-                     Q -0.01,0.5 0.03,0.06 
-                     C 0.031,0.045 0.045,0.031 0.06,0.03 Z"
-            />
+            <path d="M 0.06,0.03 Q 0.5,-0.01 0.94,0.03 C 0.955,0.031 0.969,0.045 0.97,0.06 Q 1.01,0.5 0.97,0.94 C 0.969,0.955 0.955,0.969 0.94,0.97 Q 0.5,1.01 0.06,0.97 C 0.045,0.969 0.031,0.955 0.03,0.94 Q -0.01,0.5 0.03,0.06 C 0.031,0.045 0.045,0.031 0.06,0.03 Z" />
           </clipPath>
         </defs>
       </svg>
 
       {/* Header */}
       <div
+        className="popular-header"
         style={{
           textAlign: "center",
           paddingBottom: "80px",
@@ -158,18 +173,14 @@ export default function PopularDishes() {
         <p
           ref={eyebrowRef}
           className="eyebrow"
-          style={{
-            color: "var(--text-muted)",
-            marginBottom: "20px",
-            opacity: 0,
-          }}>
+          style={{ color: "var(--text-muted)", marginBottom: "20px", opacity: 0 }}>
           From Our Kitchen
         </p>
         <h2
           ref={headRef}
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(2.6rem, 5.5vw, 5.5rem)",
+            fontSize: "clamp(2.2rem, 5.5vw, 5.5rem)",
             fontWeight: 400,
             fontStyle: "italic",
             color: "var(--text-heading)",
@@ -184,7 +195,7 @@ export default function PopularDishes() {
           ref={subRef}
           style={{
             fontFamily: "var(--font-body)",
-            fontSize: "clamp(0.88rem, 1.2vw, 1rem)",
+            fontSize: "clamp(0.85rem, 1.2vw, 1rem)",
             color: "var(--text-muted)",
             maxWidth: "460px",
             margin: "20px auto 0",
@@ -197,40 +208,50 @@ export default function PopularDishes() {
         </p>
       </div>
 
-      {/* Single Marquee Row */}
-      <div
-        className="marquee-container"
-        style={{
-          overflow: "visible",
-          width: "100%",
-          paddingTop: "20px", // Provide space for hover translation
-          marginTop: "-20px", // Offset padding to prevent layout shift
-          paddingBottom: "20px",
-          maskImage:
-            "linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)",
-          WebkitMaskImage:
-            "linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)",
-        }}
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}>
-        <div
-          className="marquee-track"
-          style={{
-            display: "flex",
-            gap: `${GAP}px`,
-            width: "max-content",
-            animation: `marqueeLeft ${duration}s linear infinite`,
-            animationPlayState: isPaused ? "paused" : "running",
-          }}>
-          {[...ALL_DISHES, ...ALL_DISHES, ...ALL_DISHES].map((dish, i) => (
-            <DishCard key={`dish-${i}`} dish={dish} />
+      {/* ── Mobile: static 3-card vertical list ── */}
+      {isMobile ? (
+        <div className="dishes-static-grid">
+          {ALL_DISHES.slice(0, 3).map((dish) => (
+            <StaticDishCard key={dish.id} dish={dish} />
           ))}
         </div>
-      </div>
+      ) : (
+        /* ── Tablet / Desktop: marquee ── */
+        <div
+          className="marquee-container"
+          style={{
+            overflow: "visible",
+            width: "100%",
+            paddingTop: "20px",
+            marginTop: "-20px",
+            paddingBottom: "20px",
+            maskImage:
+              "linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)",
+            WebkitMaskImage:
+              "linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)",
+          }}
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}>
+          <div
+            className="marquee-track"
+            style={{
+              display: "flex",
+              gap: `${GAP}px`,
+              width: "max-content",
+              animation: `marqueeLeft ${duration}s linear infinite`,
+              animationPlayState: isPaused ? "paused" : "running",
+            }}>
+            {[...ALL_DISHES, ...ALL_DISHES, ...ALL_DISHES].map((dish, i) => (
+              <MarqueeDishCard key={`dish-${i}`} dish={dish} />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* CTA */}
       <div
         ref={btnRef}
+        className="popular-cta"
         style={{ marginTop: "100px", textAlign: "center", opacity: 0 }}>
         <Link
           to="/menu"
@@ -283,96 +304,82 @@ export default function PopularDishes() {
   );
 }
 
-function DishCard({ dish }) {
+/* Marquee card — CSS clamp() controls size, GSAP handles hover image scale */
+function MarqueeDishCard({ dish }) {
   const imgRef = useRef(null);
 
   return (
     <div
-      style={{
-        flexShrink: 0,
-        width: `${CARD_W}px`,
-        textAlign: "center",
-        cursor: "pointer",
-        userSelect: "none",
-        transition: "transform 0.4s cubic-bezier(0.2, 0, 0.2, 1)",
-      }}
+      className="marquee-card"
       onMouseEnter={(e) => {
-        gsap.to(imgRef.current, {
-          scale: 1.1,
-          duration: 0.8,
-          ease: "power2.out",
-        });
+        gsap.to(imgRef.current, { scale: 1.1, duration: 0.8, ease: "power2.out" });
         e.currentTarget.style.transform = "translateY(-10px)";
       }}
       onMouseLeave={(e) => {
-        gsap.to(imgRef.current, {
-          scale: 1,
-          duration: 0.8,
-          ease: "power2.out",
-        });
+        gsap.to(imgRef.current, { scale: 1, duration: 0.8, ease: "power2.out" });
         e.currentTarget.style.transform = "translateY(0)";
       }}>
-      <div
-        style={{
-          width: "100%",
-          height: `${CARD_H}px`,
-          position: "relative",
-          marginBottom: "32px",
-          clipPath: "url(#barrelClip)",
-          WebkitClipPath: "url(#barrelClip)",
-          background: "var(--surface-section)",
-          transform: "translateZ(0)",
-        }}>
+      <div className="marquee-card-img">
         <img
           ref={imgRef}
           src={dish.img}
           alt={dish.name}
           loading="lazy"
           draggable={false}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            display: "block",
-            willChange: "transform",
-            transition: "transform 0.8s cubic-bezier(0.2, 0, 0.2, 1)",
-          }}
         />
       </div>
+      <DishText dish={dish} nameSize="clamp(1.35rem, 0.9rem + 0.45vw, 1.6rem)" />
+    </div>
+  );
+}
 
-      <div style={{ padding: "0 20px" }}>
-        <h3
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "1.6rem",
-            fontWeight: 400,
-            fontStyle: "italic",
-            color: "var(--text-heading)",
-            margin: "0 0 12px 0",
-            lineHeight: 1.2,
-            letterSpacing: "-0.01em",
-          }}>
-          {dish.name}
-        </h3>
-        <p
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize: "0.9rem",
-            color: "var(--text-muted)",
-            lineHeight: 1.6,
-            fontWeight: 300,
-            margin: 0,
-            maxWidth: "280px",
-            marginLeft: "auto",
-            marginRight: "auto",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-          }}>
-          {dish.description}
-        </p>
+/* Static card — full width, no animation, for mobile */
+function StaticDishCard({ dish }) {
+  return (
+    <div className="dish-card-static">
+      <div className="dish-card-static-img">
+        <img src={dish.img} alt={dish.name} loading="lazy" draggable={false} />
       </div>
+      <DishText dish={dish} nameSize="1.4rem" />
+    </div>
+  );
+}
+
+/* Shared text block */
+function DishText({ dish, nameSize }) {
+  return (
+    <div style={{ padding: "0 20px" }}>
+      <h3
+        style={{
+          fontFamily: "var(--font-display)",
+          fontSize: nameSize,
+          fontWeight: 400,
+          fontStyle: "italic",
+          color: "var(--text-heading)",
+          margin: "0 0 12px 0",
+          lineHeight: 1.2,
+          letterSpacing: "-0.01em",
+        }}>
+        {dish.name}
+      </h3>
+      <p
+        style={{
+          fontFamily: "var(--font-body)",
+          fontSize: "0.9rem",
+          color: "var(--text-muted)",
+          lineHeight: 1.6,
+          fontWeight: 300,
+          margin: 0,
+          maxWidth: "280px",
+          marginLeft: "auto",
+          marginRight: "auto",
+          display: "-webkit-box",
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden",
+        }}>
+        {dish.description}
+      </p>
     </div>
   );
 }
