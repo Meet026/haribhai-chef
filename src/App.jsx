@@ -7,6 +7,7 @@ import "./index.css";
 
 gsap.registerPlugin(ScrollTrigger);
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import Home from "./Home";
 import Menu from "./pages/Menu";
 
@@ -20,7 +21,7 @@ export default function App() {
       gestureOrientation: "vertical",
       smoothWheel: true,
       wheelMultiplier: 1,
-      touchMultiplier: 2,
+      touchMultiplier: 4,
     });
 
     lenis.on('scroll', ScrollTrigger.update);
@@ -44,6 +45,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/menu" element={<Menu />} />
       </Routes>
+      <Footer />
     </Router>
   );
 }

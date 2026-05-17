@@ -488,7 +488,7 @@ hr.divider {
   min-height: 100vh;
   background: var(--surface-primary);
   color: var(--text-primary);
-  padding-top: 0;
+  padding-top: 80px;
 }
 
 /* ── Living Hero Banner (Seamless Editorial Fade) ── */
