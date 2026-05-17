@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -39,17 +39,11 @@ export default function App() {
 
   return (
     <Router>
-      <NavbarWithCondition />
+      <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/menu" element={<Menu />} />
       </Routes>
     </Router>
   );
-}
-
-function NavbarWithCondition() {
-  const { pathname } = useLocation();
-  if (pathname === "/menu") return null;
-  return <Navbar />;
 }
