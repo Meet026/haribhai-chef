@@ -45,18 +45,6 @@ export default function Hero() {
       .to(titleRef.current, { y: 0, duration: 0.6 }, "-=0.6")
       .to(taglineRef.current, { opacity: 1, y: 0, duration: 0.4 }, "-=0.4");
 
-    // ── 3. FLOAT ANIMATION ────────────────────────────────────
-    const floatAnim = gsap.to([frameEl, textGroupRef.current], {
-      y: -6,
-      duration: 2.5,
-      ease: "sine.inOut",
-      yoyo: true,
-      repeat: -1,
-      stagger: 0.05,
-      paused: true,
-    });
-
-    introTl.add(() => floatAnim.play());
 
     // ── 4. SCROLL TIMELINE ────────────────────────────────────
     // Re-creatable so resize can refresh dimensions without visual drift.
@@ -84,18 +72,6 @@ export default function Hero() {
             start: "top top",
             end: "bottom bottom",
             scrub: true,
-            onUpdate: (self) => {
-              if (self.progress > 0.001 && floatAnim.isActive()) {
-                floatAnim.pause();
-                gsap.to([frameEl, textGroupRef.current], {
-                  y: 0,
-                  duration: 0.2,
-                  ease: "power1.out",
-                });
-              } else if (self.progress <= 0.001 && !floatAnim.isActive()) {
-                floatAnim.play();
-              }
-            },
           },
         });
 
@@ -150,7 +126,6 @@ export default function Hero() {
     return () => {
       introTl.kill();
       if (scrollTl) scrollTl.kill();
-      floatAnim.kill();
       clearTimeout(resizeTimer);
       window.removeEventListener("scroll", skipIntroOnScroll);
       window.removeEventListener("resize", handleResize);
