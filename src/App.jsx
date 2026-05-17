@@ -21,7 +21,7 @@ export default function App() {
       gestureOrientation: "vertical",
       smoothWheel: true,
       wheelMultiplier: 1,
-      touchMultiplier: 2,
+      touchMultiplier: 4,
     });
 
     lenis.on('scroll', ScrollTrigger.update);

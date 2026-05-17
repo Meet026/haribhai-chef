@@ -13,8 +13,14 @@
 .hero-section {
   position: relative;
   width: 100%;
-  height: 500dvh;
+  height: 250dvh;
   background: var(--color-charcoal);
+}
+
+@media (min-width: 768px) {
+  .hero-section {
+    height: 500dvh;
+  }
 }
 
 .hero-sticky-container {
