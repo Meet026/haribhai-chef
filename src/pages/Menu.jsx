@@ -1,184 +1,150 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Star } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
+import { Link } from "react-router-dom";
 import gsap from "gsap";
 import MENU_CATEGORIES from "../data/menuData";
-import { motion, AnimatePresence } from "framer-motion";
 
 export default function Menu() {
   const [selectedCategoryId, setSelectedCategoryId] = useState(MENU_CATEGORIES[0].id);
+  const [hoveredCardKey, setHoveredCardKey] = useState(null);
+  const mainContentRef = useRef(null);
+
   const activeCategory = MENU_CATEGORIES.find((c) => c.id === selectedCategoryId);
-  const heroRef = useRef(null);
-  const containerRef = useRef(null);
 
-  // Scroll to top on mount
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  // Simplified Cinematic Animation
-  useEffect(() => {
-    const cols = containerRef.current?.querySelectorAll(".masonry-column");
-    if (cols?.length > 0) {
-      gsap.fromTo(
-        cols,
-        { opacity: 0, y: 15 },
-        { 
-          opacity: 1, 
-          y: 0, 
-          duration: 0.5, 
-          stagger: 0.05, 
-          ease: "power1.out"
-        }
-      );
+    if (mainContentRef.current) {
+      mainContentRef.current.scrollTo({ top: 0, behavior: "smooth" });
     }
-
-    if (heroRef.current) {
-      const elements = heroRef.current.querySelectorAll(".animate-hero");
+    const items = document.querySelectorAll(".editorial-card");
+    if (items.length > 0) {
       gsap.fromTo(
-        elements,
-        { opacity: 0, y: 15 },
-        { 
-          opacity: 1, 
-          y: 0, 
-          duration: 0.6, 
-          stagger: 0.08, 
-          ease: "power2.out"
-        }
+        items,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.4, stagger: 0.05, ease: "power2.out" }
       );
     }
   }, [selectedCategoryId]);
 
-  // Optimized Distribution logic with useMemo
-  const columns = React.useMemo(() => {
-    const items = activeCategory?.items || [];
-    const colCount = 4;
-    const cols = Array.from({ length: colCount }, () => []);
-    items.forEach((item, index) => {
-      cols[index % colCount].push(item);
-    });
-    return cols;
-  }, [activeCategory]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const heroImage = activeCategory?.items[0]?.image ?? "";
 
   return (
-    <div className="menu-page">
-      {/* ─── Living Hero Banner (God Mode Immersive) ─── */}
-      <section className="menu-hero-banner">
-        <div className="menu-hero-inner">
-          <AnimatePresence mode="wait">
-            {/* Text on Left */}
-            <motion.div 
-              className="menu-hero-content" 
-              ref={heroRef}
-              key={`text-${selectedCategoryId}`}
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
-            >
-              <div className="menu-hero-editorial">
-                <div className="editorial-eyebrow">
-                  <span className="eyebrow-text">Fine Dining Selection</span>
+    <div className="menu-split-layout">
+      {/* ─── Sidebar ─── */}
+      <aside className="menu-sidebar-fixed" style={{ zIndex: 1100 }}>
+        <Link to="/" className="menu-back-link-custom">
+          <ArrowLeft size={14} />
+          <span>Back to Home</span>
+        </Link>
+
+        <div className="menu-logo-area">
+          <h1 className="menu-brand-title">
+            The
+            <br />
+            Menu
+          </h1>
+          <p className="menu-brand-desc">
+            Explore our culinary selection, crafted with love &amp; tradition.
+          </p>
+        </div>
+
+        <div className="menu-filter-section">
+          <p className="eyebrow" style={{ marginBottom: "16px" }}>
+            Categories
+          </p>
+          <ul className="menu-vertical-cats">
+            {MENU_CATEGORIES.map((cat) => (
+              <li key={cat.id}>
+                <button
+                  className={`menu-vert-cat-btn ${selectedCategoryId === cat.id ? "active" : ""}`}
+                  onClick={() => setSelectedCategoryId(cat.id)}
+                >
+                  <span
+                    className="cat-bullet"
+                    style={{ opacity: selectedCategoryId === cat.id ? 1 : 0 }}
+                  >
+                    •
+                  </span>
+                  <span style={{ fontWeight: selectedCategoryId === cat.id ? 600 : 400 }}>
+                    {cat.name}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </aside>
+
+      {/* ─── Main Content ─── */}
+      <main className="menu-main-content" ref={mainContentRef}>
+        {/* Category Hero Image */}
+        <div className="menu-hero-image-wrap">
+          <img src={heroImage} alt={activeCategory?.name} className="menu-hero-cat-img" />
+          <div className="menu-hero-overlay">
+            <h2 className="menu-hero-cat-title">{activeCategory?.name}</h2>
+          </div>
+        </div>
+
+        <h3 className="menu-items-heading">
+          All Items ({activeCategory?.items.length ?? 0})
+        </h3>
+
+        {/* Food Editorial Grid */}
+        <div className="menu-photo-grid">
+          {activeCategory?.items.map((dish) => {
+            // Composite key — category + item id — prevents cross-category id collisions
+            const cardKey = `${selectedCategoryId}-${dish.id}`;
+            return (
+              <div
+                key={cardKey}
+                className={`editorial-card ${hoveredCardKey === cardKey ? "hovered" : ""}`}
+                onMouseEnter={() => setHoveredCardKey(cardKey)}
+                onMouseLeave={() => setHoveredCardKey(null)}
+              >
+                <div className="editorial-img-container">
+                  <img src={dish.image} alt={dish.name} loading="lazy" />
+                  <div className="editorial-hover-add">
+                    <span>Add to Order</span>
+                    <Plus size={16} />
+                  </div>
                 </div>
-                
-                <h1 className="menu-hero-title">
-                  <motion.span 
-                    className="title-pre"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1, duration: 0.5 }}
-                  >
-                    Authentic
-                  </motion.span>
-                  <motion.span 
-                    className="title-main"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2, duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
-                  >
-                    {activeCategory?.name}
-                  </motion.span>
-                </h1>
-              </div>
-            </motion.div>
-          </AnimatePresence>
 
-          {/* Sharp Framed Image on Right */}
-          <AnimatePresence mode="wait">
-            <motion.div 
-              className="menu-hero-card-wrapper"
-              key={`img-${selectedCategoryId}`}
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
-            >
-              <div className="menu-hero-bg-container">
-                <img 
-                  src={heroImage} 
-                  alt={activeCategory?.name} 
-                  className="menu-hero-bg" 
-                  decoding="async"
-                />
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </section>
-
-      {/* ─── Floating Glass Category Nav ─── */}
-      <nav className="menu-category-nav">
-        <div className="menu-category-container">
-          {MENU_CATEGORIES.map((cat) => (
-            <button
-              key={cat.id}
-              className={`menu-category-pill ${selectedCategoryId === cat.id ? "active" : ""}`}
-              onClick={() => setSelectedCategoryId(cat.id)}
-            >
-              {cat.name}
-            </button>
-          ))}
-        </div>
-      </nav>
-
-      {/* ─── True Masonry Grid ─── */}
-      <main className="menu-content-wrapper">
-        <div className="true-masonry-container" ref={containerRef}>
-          {columns.map((columnItems, colIdx) => (
-            <div key={`col-${colIdx}`} className="masonry-column">
-              {columnItems.map((dish, dishIdx) => (
-                <div key={`${dish.id}-${dishIdx}`} className="menu-3d-card">
-                  <div className="menu-card-image-wrap">
-                    {dishIdx === 0 && colIdx % 2 === 0 && (
-                      <div className="menu-card-badge">Signature</div>
-                    )}
-                    <img 
-                      src={dish.image} 
-                      alt={dish.name} 
-                      className="menu-card-image" 
-                      loading="lazy" 
-                      decoding="async"
-                    />
+                <div className="editorial-content">
+                  <div className="editorial-header">
+                    <h4 className="editorial-name">{dish.name}</h4>
+                    {dish.price && <span className="editorial-price">{dish.price}</span>}
                   </div>
 
-                  <div className="menu-card-content">
-                    <h3 className="menu-card-title">{dish.name}</h3>
-                    <span className="menu-card-price">{dish.price}</span>
-                    <p className="menu-card-desc">{dish.description}</p>
-
-                    <div className="menu-card-footer">
-                      <div className="menu-card-rating">
-                        <Star size={10} fill="currentColor" />
-                        <span>{dish.reviews || "4.9"}</span>
-                      </div>
-                      <span className="menu-action-btn">Details</span>
+                  {(dish.reviews || dish.description) && (
+                    <div className="editorial-meta">
+                      {dish.reviews && (
+                        <span className="editorial-reviews">★ {dish.reviews}</span>
+                      )}
+                      {dish.reviews && dish.description && (
+                        <span className="editorial-dot">•</span>
+                      )}
+                      {dish.description && (
+                        <span className="editorial-portion">1 Portion</span>
+                      )}
                     </div>
-                  </div>
+                  )}
+
+                  {dish.description && (
+                    <p className="editorial-desc">{dish.description}</p>
+                  )}
+
+                  {dish.ingredients?.length > 0 && (
+                    <div className="editorial-ingredients">
+                      <strong>Ingredients:</strong> {dish.ingredients.join(", ")}
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
       </main>
     </div>
