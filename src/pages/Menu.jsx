@@ -22,11 +22,11 @@ export default function Menu() {
       gsap.fromTo(
         cols,
         { opacity: 0, y: 15 },
-        { 
-          opacity: 1, 
-          y: 0, 
-          duration: 0.5, 
-          stagger: 0.05, 
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+          stagger: 0.05,
           ease: "power1.out"
         }
       );
@@ -37,11 +37,11 @@ export default function Menu() {
       gsap.fromTo(
         elements,
         { opacity: 0, y: 15 },
-        { 
-          opacity: 1, 
-          y: 0, 
-          duration: 0.6, 
-          stagger: 0.08, 
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          stagger: 0.08,
           ease: "power2.out"
         }
       );
@@ -68,8 +68,8 @@ export default function Menu() {
         <div className="menu-hero-inner">
           <AnimatePresence mode="wait">
             {/* Text on Left */}
-            <motion.div 
-              className="menu-hero-content" 
+            <motion.div
+              className="menu-hero-content"
               ref={heroRef}
               key={`text-${selectedCategoryId}`}
               initial={{ opacity: 0, x: -30 }}
@@ -81,9 +81,9 @@ export default function Menu() {
                 <div className="editorial-eyebrow">
                   <span className="eyebrow-text">Fine Dining Selection</span>
                 </div>
-                
+
                 <h1 className="menu-hero-title">
-                  <motion.span 
+                  <motion.span
                     className="title-pre"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -91,7 +91,7 @@ export default function Menu() {
                   >
                     Authentic
                   </motion.span>
-                  <motion.span 
+                  <motion.span
                     className="title-main"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -106,7 +106,7 @@ export default function Menu() {
 
           {/* Sharp Framed Image on Right */}
           <AnimatePresence mode="wait">
-            <motion.div 
+            <motion.div
               className="menu-hero-card-wrapper"
               key={`img-${selectedCategoryId}`}
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -115,10 +115,10 @@ export default function Menu() {
               transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
             >
               <div className="menu-hero-bg-container">
-                <img 
-                  src={heroImage} 
-                  alt={activeCategory?.name} 
-                  className="menu-hero-bg" 
+                <img
+                  src={heroImage}
+                  alt={activeCategory?.name}
+                  className="menu-hero-bg"
                   decoding="async"
                 />
               </div>
@@ -127,18 +127,28 @@ export default function Menu() {
         </div>
       </section>
 
-      {/* ─── Floating Glass Category Nav ─── */}
+      {/* ─── Premium Editorial Category Nav ─── */}
       <nav className="menu-category-nav">
         <div className="menu-category-container">
-          {MENU_CATEGORIES.map((cat) => (
-            <button
-              key={cat.id}
-              className={`menu-category-pill ${selectedCategoryId === cat.id ? "active" : ""}`}
-              onClick={() => setSelectedCategoryId(cat.id)}
-            >
-              {cat.name}
-            </button>
-          ))}
+          {MENU_CATEGORIES.map((cat) => {
+            const isActive = selectedCategoryId === cat.id;
+            return (
+              <button
+                key={cat.id}
+                className={`menu-category-pill ${isActive ? "active" : ""}`}
+                onClick={() => setSelectedCategoryId(cat.id)}
+              >
+                <span className="category-name">{cat.name}</span>
+                {isActive && (
+                  <motion.span
+                    layoutId="activeCategoryUnderline"
+                    className="category-underline"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
+              </button>
+            );
+          })}
         </div>
       </nav>
 
@@ -150,29 +160,29 @@ export default function Menu() {
               {columnItems.map((dish, dishIdx) => (
                 <div key={`${dish.id}-${dishIdx}`} className="menu-3d-card">
                   <div className="menu-card-image-wrap">
-                    {dishIdx === 0 && colIdx % 2 === 0 && (
+                    {/* {dishIdx === 0 && colIdx % 2 === 0 && (
                       <div className="menu-card-badge">Signature</div>
-                    )}
-                    <img 
-                      src={dish.image} 
-                      alt={dish.name} 
-                      className="menu-card-image" 
-                      loading="lazy" 
+                    )} */}
+                    <img
+                      src={dish.image}
+                      alt={dish.name}
+                      className="menu-card-image"
+                      loading="lazy"
                       decoding="async"
                     />
-                  </div>
 
-                  <div className="menu-card-content">
-                    <h3 className="menu-card-title">{dish.name}</h3>
-                    <span className="menu-card-price">{dish.price}</span>
-                    <p className="menu-card-desc">{dish.description}</p>
+                    <div className="menu-card-content">
+                      <h3 className="menu-card-title">{dish.name}</h3>
+                      {dish.price && <span className="menu-card-price">{dish.price}</span>}
+                      {dish.description && <p className="menu-card-desc">{dish.description}</p>}
 
-                    <div className="menu-card-footer">
-                      <div className="menu-card-rating">
-                        <Star size={10} fill="currentColor" />
-                        <span>{dish.reviews || "4.9"}</span>
+                      <div className="menu-card-footer">
+                        <div className="menu-card-rating">
+                          <Star size={10} fill="currentColor" />
+                          <span>{dish.reviews || "4.9"}</span>
+                        </div>
+                        <span className="menu-action-btn">Details</span>
                       </div>
-                      <span className="menu-action-btn">Details</span>
                     </div>
                   </div>
                 </div>
