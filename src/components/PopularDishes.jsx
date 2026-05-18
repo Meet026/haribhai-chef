@@ -99,7 +99,6 @@ export default function PopularDishes() {
     () => typeof window !== "undefined" && window.innerWidth < 768,
   );
 
-  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     const mqMobile = window.matchMedia("(max-width: 767px)");
@@ -225,13 +224,8 @@ export default function PopularDishes() {
             paddingTop: "20px",
             marginTop: "-20px",
             paddingBottom: "20px",
-            maskImage:
-              "linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)",
-            WebkitMaskImage:
-              "linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)",
           }}
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}>
+>
           <div
             className="marquee-track"
             style={{
@@ -239,7 +233,7 @@ export default function PopularDishes() {
               gap: `${GAP}px`,
               width: "max-content",
               animation: `marqueeLeft ${duration}s linear infinite`,
-              animationPlayState: isPaused ? "paused" : "running",
+              animationPlayState: "running",
             }}>
             {[...ALL_DISHES, ...ALL_DISHES, ...ALL_DISHES].map((dish, i) => (
               <MarqueeDishCard key={`dish-${i}`} dish={dish} />
@@ -306,22 +300,10 @@ export default function PopularDishes() {
 
 /* Marquee card — CSS clamp() controls size, GSAP handles hover image scale */
 function MarqueeDishCard({ dish }) {
-  const imgRef = useRef(null);
-
   return (
-    <div
-      className="marquee-card"
-      onMouseEnter={(e) => {
-        gsap.to(imgRef.current, { scale: 1.1, duration: 0.8, ease: "power2.out" });
-        e.currentTarget.style.transform = "translateY(-10px)";
-      }}
-      onMouseLeave={(e) => {
-        gsap.to(imgRef.current, { scale: 1, duration: 0.8, ease: "power2.out" });
-        e.currentTarget.style.transform = "translateY(0)";
-      }}>
+    <div className="marquee-card">
       <div className="marquee-card-img">
         <img
-          ref={imgRef}
           src={dish.img}
           alt={dish.name}
           loading="lazy"

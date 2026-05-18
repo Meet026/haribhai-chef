@@ -151,19 +151,6 @@ export default function Hero() {
             </h1>
           </div>
 
-          <div ref={taglineRef} className="hero-tagline-container">
-            <svg viewBox="0 0 600 120" className="hero-tagline-svg">
-              <path id="curve-path" fill="none" d="M 50,20 Q 300,100 550,20" />
-              <text className="hero-tagline-text">
-                <textPath
-                  xlinkHref="#curve-path"
-                  startOffset="50%"
-                  textAnchor="middle">
-                  Authentic Gujarati Catering · Since 2010
-                </textPath>
-              </text>
-            </svg>
-          </div>
         </div>
 
         <Particles />
