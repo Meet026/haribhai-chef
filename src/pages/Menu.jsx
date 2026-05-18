@@ -48,16 +48,32 @@ export default function Menu() {
     }
   }, [selectedCategoryId]);
 
+  const [colCount, setColCount] = useState(() => {
+    if (typeof window === "undefined") return 4;
+    if (window.innerWidth < 640) return 2;
+    if (window.innerWidth < 1100) return 3;
+    return 4;
+  });
+
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth < 640) setColCount(2);
+      else if (window.innerWidth < 1100) setColCount(3);
+      else setColCount(4);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
   // Optimized Distribution logic with useMemo
   const columns = React.useMemo(() => {
     const items = activeCategory?.items || [];
-    const colCount = 4;
     const cols = Array.from({ length: colCount }, () => []);
     items.forEach((item, index) => {
       cols[index % colCount].push(item);
     });
     return cols;
-  }, [activeCategory]);
+  }, [activeCategory, colCount]);
 
   const heroImage = activeCategory?.items[0]?.image ?? "";
 

@@ -917,91 +917,107 @@ hr.divider {
 }
 
 /* ── Responsive ── */
+
+/* ── Tablet landscape / small desktop ── */
 @media (max-width: 1400px) {
-  .true-masonry-container {
-    gap: 32px;
+  .menu-hero-banner {
+    width: calc(100vw - 64px);
+    height: 260px;
   }
-
-  .masonry-column {
-    gap: 48px;
-  }
+  .true-masonry-container { gap: 28px; }
+  .masonry-column { gap: 28px; }
+  .menu-content-wrapper { padding: 0 32px 120px; }
+  .menu-category-container { padding: 0 32px; gap: 20px; }
 }
 
+/* ── Tablet portrait (3 cols) ── */
 @media (max-width: 1100px) {
-  .true-masonry-container {
-    gap: 24px;
+  .menu-hero-banner {
+    width: calc(100vw - 48px);
+    height: 240px;
   }
-
-  .masonry-column:nth-child(4) {
-    display: none;
-  }
-
-  /* Drop to 3 cols */
+  .menu-hero-content { padding: 0 48px 0 16px; }
+  .true-masonry-container { gap: 20px; }
+  .masonry-column { gap: 20px; }
+  .menu-content-wrapper { padding: 0 24px 100px; }
+  .menu-category-container { padding: 0 24px; gap: 16px; }
+  .menu-category-pill { font-size: 0.72rem; letter-spacing: 0.08em; }
 }
 
-@media (max-width: 800px) {
-  .masonry-column:nth-child(3) {
-    display: none;
-  }
-
-  /* Drop to 2 cols */
-}
-
-@media (max-width: 600px) {
-  .true-masonry-container {
-    flex-direction: column;
-    gap: 40px;
-  }
-
-  .masonry-column {
-    gap: 40px;
-  }
-
-  .masonry-column:nth-child(n+2) {
-    display: flex;
-  }
-
-  /* Show all in stack */
-  .menu-content-wrapper {
-    padding: 0 20px 64px 20px;
-  }
-
-  .menu-hero-title .title-main {
-    font-size: 2.8rem;
-  }
-
+/* ── Mobile landscape / large phones (still 3 cols, smaller hero) ── */
+@media (max-width: 900px) {
+  .menu-page { padding-top: 64px; }
   .menu-hero-banner {
     width: calc(100vw - 32px);
-    height: 380px; /* Reduced from 500px to bring items up on mobile */
-    margin: 15px auto;
+    height: 200px;
+    margin: 12px auto;
     border-radius: 12px;
   }
+  .menu-hero-content { padding: 0 32px 0 12px; }
+  .title-main { font-size: clamp(1.6rem, 3.2vw, 2.4rem); }
+  .title-pre { font-size: 0.7rem; letter-spacing: 0.25em; }
+  .menu-category-nav { top: 64px; padding: 16px 0 12px; }
+  .menu-category-container { padding: 0 16px; gap: 12px; }
+  .menu-category-pill { font-size: 0.68rem; padding: 6px 2px 10px; }
+  .true-masonry-container { gap: 14px; }
+  .masonry-column { gap: 14px; }
+  .menu-content-wrapper { padding: 0 16px 80px; }
+  .menu-card-title { font-size: 1rem; }
+}
 
-  .menu-hero-inner {
-    flex-direction: column-reverse; /* Text below image on mobile */
+/* ── Mobile portrait (2 cols — 4 items visible per screen) ── */
+@media (max-width: 639px) {
+  .menu-page { padding-top: 60px; }
+
+  /* Hero: compact single-column layout */
+  .menu-hero-banner {
+    width: calc(100vw - 24px);
+    height: auto;
+    min-height: 160px;
+    margin: 10px auto;
+    border-radius: 10px;
   }
-
+  .menu-hero-inner { flex-direction: row; }
   .menu-hero-content {
-    flex: 0 0 45%;
-    padding: 20px;
-    align-items: center;
-    text-align: center;
+    flex: 1;
+    padding: 16px 8px 16px 16px;
+    align-items: flex-start;
   }
-  
+  .menu-hero-card-wrapper { flex: 0 0 42%; }
   .menu-hero-editorial {
-    border-left: none;
-    padding-left: 0;
-    align-items: center;
-    gap: 8px;
+    border-left: 2px solid rgba(200, 184, 154, 0.4);
+    padding-left: 14px;
+    gap: 6px;
+  }
+  .title-main { font-size: clamp(1.4rem, 5.5vw, 2rem); }
+  .title-pre { font-size: 0.62rem; letter-spacing: 0.2em; }
+  .editorial-eyebrow { font-size: 0.6rem; letter-spacing: 0.18em; }
+
+  /* Category nav */
+  .menu-category-nav { top: 60px; padding: 12px 0 8px; margin-bottom: 16px; }
+  .menu-category-container { padding: 0 12px; gap: 8px; justify-content: flex-start; }
+  .menu-category-pill { font-size: 0.62rem; padding: 5px 2px 8px; letter-spacing: 0.06em; }
+
+  /* 2-column grid — 4 cards visible per screen */
+  .true-masonry-container { gap: 10px; }
+  .masonry-column { gap: 10px; }
+  .menu-content-wrapper { padding: 0 12px 60px; }
+
+  /* Uniform aspect ratio on mobile for density */
+  .masonry-column:nth-child(1) .menu-3d-card:nth-child(2n+1) .menu-card-image-wrap,
+  .masonry-column:nth-child(2) .menu-3d-card:nth-child(2n) .menu-card-image-wrap,
+  .masonry-column:nth-child(3) .menu-3d-card:nth-child(3n+1) .menu-card-image-wrap,
+  .masonry-column:nth-child(4) .menu-3d-card:nth-child(3n) .menu-card-image-wrap {
+    aspect-ratio: 3 / 4;
   }
 
-  .menu-hero-card-wrapper {
-    flex: 0 0 55%;
-    width: 100%;
-  }
+  /* Smaller card text */
+  .menu-card-title { font-size: 0.88rem; margin-bottom: 3px; }
+  .menu-card-price { font-size: 0.65rem; }
+  .menu-card-content { padding: 16px 12px 12px; }
 
-  .menu-hero-bg-container {
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%);
-    mask-image: linear-gradient(to bottom, transparent 0%, black 20%);
+  /* Disable 3D tilt on touch — causes jank */
+  .menu-3d-card:hover {
+    transform: none;
   }
 }
