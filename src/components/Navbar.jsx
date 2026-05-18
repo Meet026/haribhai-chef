@@ -66,7 +66,7 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const onDark = isHomePage && !scrolledPastHero && !mobileMenuOpen;
+  const onDark = (isHomePage && !scrolledPastHero) || mobileMenuOpen;
   const navColor = onDark ? "var(--color-ivory)" : "var(--color-charcoal)";
   const navBg = onDark ? "transparent" : "rgba(245, 240, 232, 0.85)";
 
